@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 
 POSTS = [
@@ -23,14 +23,23 @@ POSTS = [
 app = Flask(__name__)
 
 
-@app.route('/posts')
+@app.route('/posts', methods=['GET', 'POST'])
 def items():
     response_data = {
         'success': True,
-        'data': POSTS
+        'data': []
     }
 
-    return jsonify(response_data)
+    if request.method == 'GET':
+        response_data['data'] = POSTS
+        return jsonify(response_data)
+    elif request.method == 'POST':
+        data = request.json
+        POSTS.append(data)
+        response_data['data'] = POSTS
+        response = jsonify(response_data)
+        response.status_code = 201
+        return response
 
 
 if __name__ == '__main__':
